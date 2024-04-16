@@ -1,0 +1,62 @@
+
+        $content-width: 1000px;
+        $breakpoint: 799px;
+        $nav-height: 70px;
+        $color-white:#fff;
+        $nav-background: #130101;
+        $nav-font-color: #eb0808;
+        $link-hover-color: #f8b500;
+  
+.navigation {
+    height: $nav-height;
+    background: $nav-background;
+    scroll-behavior: smooth;
+}
+
+.nav-container {
+    max-width: $content-width;
+    margin: 0 auto;
+}
+
+
+.brand {
+    position: absolute;
+    padding-left: 20px;
+    float: left;
+    line-height: $nav-height;
+    text-transform: uppercase;
+    font-size: 1.4em;
+
+    &:hover {}
+
+    a,
+    a:visited {
+        color: $nav-font-color;
+        text-decoration: none;
+    }
+}
+
+.pill-filter {
+    display: flex;
+    overflow-x: auto;
+    padding: 5px;
+    margin-bottom: 10px;
+
+    .pill {
+        cursor: pointer;
+        padding: 5px ;
+        margin: 5px;
+        border-radius: 10px;
+        background-color: #282c34;
+        transition: background-color 0.3s;
+        color: $color-white;
+        &:hover {
+            background-color: #aaa;
+        }
+
+        &.active {
+            background-color:$nav-font-color;
+            color: #fff;
+        }
+    }
+}
