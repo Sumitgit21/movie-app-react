@@ -1,5 +1,4 @@
 import { useState } from 'react'
-// import './App.css'
 import Home from './pages/Home'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
