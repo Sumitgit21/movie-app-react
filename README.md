@@ -9,7 +9,6 @@ Make sure you have Node.js and npm installed on your system. You can download an
 ## Getting Started
 
 1. Clone this repository to your local machine:
-
    ```bash
    git clone https://github.com/Sumitgit21/movie-app-react.git
   
@@ -17,14 +16,18 @@ Make sure you have Node.js and npm installed on your system. You can download an
 2. Navigate into the project directory
      ```bash
    cd movie-app-react
-   npm install
-   npm run dev
+  
 2. Install node_modules
      ```bash
    npm install
-2. Install node_modules
+  
+3. Run on Local host
      ```bash
    npm run dev
+
+4. Make Production build 
+     ```bash
+   npm run build
 
 ## Requirements Covered
 
