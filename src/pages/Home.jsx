@@ -1,83 +1,88 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Navbar from '../components/Navbar'
 import Spinner from '../components/Spinner'
-import MovieCard from '../components/MovieCard';
 import '../assets/css/home.scss';
-import useDetectScroll, { Axis, Direction } from '../common/hooks/useDetectScroll';
 import { useGetMovieList } from '../services/queryHooks/home.hook';
+import MovieList from '../components/MovieList';
 
 const Home = () => {
-    const { scrollDirection, scrollPosition } = useDetectScroll({
-        thresholdValue: 100,
-        axis: Axis.Y,
-        scrollUp: Direction.Up,
-        scrollDown: Direction.Down,
-        still: Direction.Still
-    });
-
     const topElementRef = useRef(null);
     const bottomElementRef = useRef(null);
-
-    const [movies, setMovies] = useState([]);
-    const [selectedGenreList, setSelectedGenreList] = useState([]);
+    const movies = useRef([]);
+    const [rerender, setRerender] = useState(false);
+    const [selectedGenreList, setSelectedGenreList] = useState('');
     const [movieYears, setMovieYears] = useState([]);
     const [currentYear, setCurrentYear] = useState(2012);
-    const [loading, setLoading] = useState(false)
+
+    const groupDataByYear = data => {
+        const groupedData = {};
+        data.forEach(item => {
+            const year = new Date(item.release_date).getFullYear();
+            if (!groupedData[year]) {
+                groupedData[year] = [];
+            }
+            groupedData[year].push(item);
+        });
+        return Object.entries(groupedData);
+    };
 
     const onSuccess = (data) => {
         if (data?.results?.length > 0) {
-
-            setMovies((prevMovies) => [...prevMovies, { year: currentYear, movies: data.results }]);
+            const newDataYearwise = groupDataByYear(data.results);
+            movies.current = [...movies.current, ...newDataYearwise]
+            setRerender(!rerender);
         }
     }
+
     const { data: moviesResponse, isLoading: isMovieLoading, refetch: refetchMovies } = useGetMovieList(currentYear, 1, selectedGenreList, onSuccess);
 
-    const handleGenreSelection = (genreList) => {
-        setMovieYears(2012);
-        setMovies([])
-        console.log("newSelectedList.toString()", genreList, genreList.toString());
+    const handleGenreSelection = useCallback((genreList) => {
+        movies.current = []
+        setCurrentYear(2012)
+        setMovieYears([2012]);
         setSelectedGenreList(genreList.toString());
-    };
+
+    }, [selectedGenreList]);
 
     useEffect(() => {
-        // refetchMovies()
+        refetchMovies()
     }, [selectedGenreList])
 
-    useEffect(() => {
-        setLoading(isMovieLoading)
-    }, [isMovieLoading])
 
     useEffect(() => {
         const options = {
             root: null,
-            rootMargin: '0px',
+            rootMargin: '10px',
             threshold: 0.5,
         };
 
         const handleIntersection = (entries) => {
+            console.group("handle Intersection")
             entries.forEach(entry => {
                 if (entry.isIntersecting && !isMovieLoading) {
                     if (entry.target === topElementRef.current) {
                         // Top element is intersecting, decrement year
-                        console.log("scroll down ", currentYear)
                         if (currentYear > 2012) {
                             setCurrentYear(currentYear - 1);
                         }
+                        console.log("scroll up ", entry.target === topElementRef.current, currentYear)
                     } else if (entry.target === bottomElementRef.current) {
+                        console.log("scroll down ", currentYear < new Date().getFullYear(), currentYear)
                         // Bottom element is intersecting, increment year
-                        if (currentYear < new Date().getFullYear()) {
+                        if (currentYear >= 2012 && currentYear < new Date().getFullYear()) {
                             setCurrentYear(currentYear + 1);
                         }
                     }
                 }
             });
+            console.groupEnd("handle Intersection")
         };
 
         const observer = new IntersectionObserver(handleIntersection, options);
-        if (topElementRef.current) {
+        if (topElementRef.current && !isMovieLoading) {
             observer.observe(topElementRef.current);
         }
-        if (bottomElementRef.current) {
+        if (bottomElementRef.current && !isMovieLoading) {
             observer.observe(bottomElementRef.current);
         }
 
@@ -89,60 +94,37 @@ const Home = () => {
                 observer.unobserve(bottomElementRef.current);
             }
         };
-    }, [isMovieLoading]);
+    }, [currentYear, isMovieLoading]);
 
-    const handleSearch = () => {
-
-    }
 
     useEffect(() => {
-        if (!movieYears.includes(currentYear) && !isMovieLoading) {
-            // refetchMovies();
+        const tempUniqueYears = movieYears;
+        if (tempUniqueYears && Array.isArray(tempUniqueYears) && !tempUniqueYears.includes(currentYear)) {
+            tempUniqueYears.push(currentYear)
+            setMovieYears(tempUniqueYears);
         }
-    }, [isMovieLoading]);
+    }, [movieYears, currentYear]);
 
-    useEffect(() => {
-
-        const years = movies.map((movie) => movie.year);
-        const uniqueYears = [...new Set(years)];
-        console.log("unique year", uniqueYears)
-        setMovieYears(uniqueYears);
-    }, [movies]);
-
-    // console.log("movie year", movieYears);
     return (
         <>
             <Navbar
                 onGenreSelect={handleGenreSelection}
-                onSearch={handleSearch}
                 className='sticky-navbar'
             />
             <>
-                <div ref={topElementRef}></div>
-                {movieYears?.length > 0 && movieYears.map((year, index) => {
-                    const moviesOfYear = movies.find((movieGroup) => movieGroup.year === year)?.movies || [];
-                    return (
-                        <div key={index} className="movie-list">
-                            <div className="movie-list__year">
-                                <h2 className="movie-list__year-heading">{year}</h2>
-                                <div className="movie-list__movies">
-                                    {moviesOfYear.map((movie, index) => (
-                                        <MovieCard key={`${movie.id}_${index}`} movie={movie} image={movie.poster_path} overview={movie.overview} title={movie.title} />
-                                    ))}
-                                </div>
-                            </div>
+                <div id="top" ref={topElementRef}></div>
+                <div key={1} className="movie-list">
+                    {movies?.current?.length > 0 ? <MovieList movies={movies.current} /> : isMovieLoading ? <>
+                        <div className='spinner-bottom'>
+                            <Spinner />
                         </div>
-                    );
-                })}
-                <div ref={bottomElementRef}></div>
-            </>
-            {isMovieLoading && (
-                <div className='spinner-bottom'>
-                    <Spinner />
+                    </> : <><p>No Data Found</p></>}
+                    {movies?.current?.length > 0 && isMovieLoading && <div className='spinner-bottom'>
+                        <Spinner />
+                    </div>}
                 </div>
-            )
-            }
-
+                {<div id="boootm" ref={bottomElementRef}></div>}
+            </>
         </>
     );
 };

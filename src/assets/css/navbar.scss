@@ -21,14 +21,11 @@
 
 .brand {
     position: absolute;
-    padding-left: 20px;
+   margin-left: 1.5rem;
     float: left;
     line-height: $nav-height;
     text-transform: uppercase;
     font-size: 1.4em;
-
-    &:hover {}
-
     a,
     a:visited {
         color: $nav-font-color;
@@ -38,22 +35,51 @@
 
 .pill-filter {
     display: flex;
+    flex-direction: row;
+    align-items: center;
     overflow-x: auto;
-    padding: 5px;
+    padding-left: 10px;
     margin-bottom: 10px;
 
+    &::-webkit-scrollbar {
+            width: 5px;
+            /* Width of the scrollbar */
+        }
+    
+        &::-webkit-scrollbar-track {
+            background: #333;
+            /* Background color of the scrollbar track */
+            border-radius: 10px;
+            /* Radius of the scrollbar track */
+        }
+    
+        &::-webkit-scrollbar-thumb {
+            background: #555;
+            /* Color of the scrollbar thumb */
+            border-radius: 10px;
+            /* Radius of the scrollbar thumb */
+        }
+    
+        &::-webkit-scrollbar-thumb:hover {
+            background: #777;
+            /* Color of the scrollbar thumb on hover */
+        }
     .pill {
+
+        padding: 5px 10px;
+        margin-right: 10px;
+        border-radius: 20px;
         cursor: pointer;
-        padding: 5px ;
-        margin: 5px;
-        border-radius: 10px;
         background-color: #282c34;
         transition: background-color 0.3s;
         color: $color-white;
+        font-size: 1em;
         &:hover {
             background-color: #aaa;
         }
-
+        &:last-child {
+            margin-right: 0;
+        }
         &.active {
             background-color:$nav-font-color;
             color: #fff;

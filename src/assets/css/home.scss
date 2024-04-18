@@ -1,6 +1,7 @@
 .movie-list {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
   justify-content: space-between;
   gap: 20px;
   margin: 10px;
@@ -17,9 +18,10 @@
   }
 
   .movie-list__movies {
-    display: flex; // Flexbox layout for mobile
-    flex-wrap: wrap; // Wrap items onto multiple lines
-    margin: -10px; // Negative margin to offset grid gap
+    display: flex; 
+    flex-wrap: wrap; 
+    flex-direction: column;
+    margin: -10px; 
 
     // Responsive layout for desktop
     @media (min-width: 768px) {
