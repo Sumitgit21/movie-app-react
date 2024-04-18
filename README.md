@@ -25,4 +25,20 @@ Make sure you have Node.js and npm installed on your system. You can download an
 2. Install node_modules
      ```bash
    npm run dev
+
+## Requirements Covered
+
+### Layout and UI
+- Created custom UI components using React for improved reusability.
+- Displayed a list of movies sorted in descending order of popularity.
+- Showed movie title, image, genre, cast, director, and a short description on each information card.
+
+### Default Page Load State
+- Loaded a total of 20 movies for each year.
+- By default, displayed a list of movies from the year 2012.
+- Implemented smooth scrolling behavior to load more movies dynamically:
+  - Loaded movies of the previous year when the user scrolls up.
+  - Loaded movies of the next year when the user scrolls down.
+- Ensured smooth interaction without causing any jitters as movies are added to the list dynamically.
+
  
